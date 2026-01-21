@@ -1,6 +1,4 @@
 import sys
-{sys.executable} -m pip install geopandas matplotlib scikit-learn streamlit numpy
-
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt

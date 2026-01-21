@@ -1,32 +1,15 @@
+import sys
+!{sys.executable} -m pip install geopandas matplotlib scikit-learn streamlit numpy
 
 import streamlit as st
-import geopandas as gpd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
+import geopandas as gpd
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 
-st.set_page_config(page_title="Geospatial Clustering Project–1", layout="wide")
+gdf = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
 
-# --------------------------------------------------
-# Title
-# --------------------------------------------------
-st.title("📍 PROJECT–1")
-st.subheader("Attribute-Based Geospatial Clustering of San Diego Census Tracts")
-st.markdown("**Using GeoPandas and K-Means (Non-Folium Version)**")
-
-# --------------------------------------------------
-# Load Data
-# --------------------------------------------------
-@st.cache_data
-def load_data():
-    return gpd.read_file("sandiego_tracts.gpkg")
-
-gdf = load_data()
-
-# --------------------------------------------------
-# Sidebar Controls
-# --------------------------------------------------
 st.sidebar.header("⚙️ Clustering Parameters")
 
 numeric_cols = gdf.select_dtypes(include=[np.number]).columns.tolist()
@@ -39,15 +22,9 @@ selected_features = st.sidebar.multiselect(
 
 k = st.sidebar.slider("Number of Clusters (K)", min_value=2, max_value=8, value=4)
 
-# --------------------------------------------------
-# Dataset Preview
-# --------------------------------------------------
 st.subheader("📊 Dataset Preview")
 st.dataframe(gdf.head())
 
-# --------------------------------------------------
-# Clustering Logic
-# --------------------------------------------------
 if selected_features:
     features = gdf[selected_features].dropna()
 
@@ -59,9 +36,6 @@ if selected_features:
 
     gdf.loc[features.index, "Cluster"] = clusters
 
-    # --------------------------------------------------
-    # Map Visualization (Matplotlib)
-    # --------------------------------------------------
     st.subheader("🗺️ Clustered Census Tracts Map")
 
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
@@ -79,9 +53,6 @@ if selected_features:
 
     st.pyplot(fig)
 
-    # --------------------------------------------------
-    # Cluster Summary
-    # --------------------------------------------------
     st.subheader("📈 Cluster Summary Statistics")
     summary = gdf.groupby("Cluster")[selected_features].mean().round(2)
     st.dataframe(summary)
